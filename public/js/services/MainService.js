@@ -5,10 +5,10 @@ angular.module('MainService', []).factory('MainService',['$http','$q', function(
 
 
 
-	return {
+	return { 
 		getNear: function(lat, lon) {
-			console.log('/api/restaurantNear/'+ lat + '/' + lon);
-			console.log(lat, lon, 'from service' );
+			//console.log('/api/restaurantNear/'+ lat + '/' + lon);
+			//console.log(lat, lon, 'from service' );
 			return $http({
 				url: '/api/restaurantNear/'+ lat + '/' + lon,
 				method: 'GET',

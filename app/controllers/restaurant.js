@@ -34,11 +34,10 @@ exports.all = function(req, res) {
  */
 exports.near = function(req, res) {
     
-    var term = req.params.lat +','+ req.params.lon;
+    var term = req.params.lon +','+ req.params.lat;
     console.log(term);
-    //var coords = req.body.coords.lon + ',' + req.body.coords.lat;
-    //console.log(coords,'coords from node');
-    yelp.search({term: "food", ll: '33.90867,-117.87970', limit: 20}, function(err, data) {
+    
+    yelp.search({term: "food", ll: term, limit: 20}, function(err, data) {
         if (err)  console.log(err);
         //console.log(data,'data from yelp');
         res.jsonp(data.businesses);
