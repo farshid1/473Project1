@@ -1,1 +1,1 @@
-angular.module('sampleApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'MainService']);
+angular.module('sampleApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'MainService', 'SearchCtrl', 'SearchService']);
