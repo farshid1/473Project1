@@ -33,6 +33,9 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 			);
 
 	};
+	$scope.submit = function () {
+		
+	}
 
 
 	

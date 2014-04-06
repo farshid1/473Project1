@@ -14,10 +14,40 @@ var RestaurantSchema = new Schema({
     name: {
         type: String,
         trim: true
+    },
+    url: {
+    	type: String,
+    	trim: true
+    },
+    distance: {
+    	type: String,
+    	trim: true
+    },
+    rating_img_url: {
+    	type: String,
+        trim: true
+    },
+    review_count: {
+        type: String,
+        trim: true
+    },
+    address_display: [],
+    location: [Number],
+    phone: {
+        type: String,
+        trim: true
+    },
+
+    category: {
+        type: String,
+        trim: true
     }
 });
 
-	
+/**
+ * Index Location
+ */
+RestaurantSchema.index({location: '2d'});	
 /**
  * Statics
  */
