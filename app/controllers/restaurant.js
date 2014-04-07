@@ -115,7 +115,7 @@ var filterYelpData = function (restaurant, callback) {
         saveRestaurant(err, data));
 
 };
-function getRestaurants(err, docs, res) {
+var getRestaurants = function (err, docs, res) {
 
     if (err)
         throw err;
@@ -151,7 +151,6 @@ var near = function (req, res) {
     });
 };
 exports.near = near;
-
 
 /**
  * List of Restaurants close by
