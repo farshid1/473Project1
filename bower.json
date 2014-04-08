@@ -1,13 +1,17 @@
 {
-	"name": "nagular",
-	"version": "1.0.0",
-	"dependencies": {
-		"bootstrap": "latest",
-		"font-awesome": "latest",
-		"animate.css": "latest",
-		"angular": "latest",
-		"angular-route": "latest",
-		"jquery": "latest",
-		"angular-geolocation": "latest"
-	}
+  "name": "nagular",
+  "version": "1.0.0",
+  "dependencies": {
+    "bootstrap": "latest",
+    "font-awesome": "latest",
+    "animate.css": "latest",
+    "angular": "latest",
+    "angular-route": "latest",
+    "jquery": "latest",
+    "angular-geolocation": "latest",
+    "angular-loading-bar": "~0.3.0",
+    "angular-bootstrap": "~0.10.0",
+    "angular-google-maps": "~1.0.18",
+    "underscore": "~1.6.0"
+  }
 }

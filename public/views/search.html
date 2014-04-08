@@ -1,40 +1,71 @@
 
-<form class="form-horizontal" data-ng-init="load()" ng-submit="submit()">
+<form class="form-horizontal">
 <fieldset>
 
 <!-- Form Name -->
-<legend>Find Food</legend>
+<legend>Find Restaurant</legend>
 
-<!-- Text inputs-->
-
-<div class="form-group" ng-repeat="f in formTextData">
-  <label class="{{f.labelClass}}" for="{{f.labelFor}}">{{f.name | uppercase}}</label>
-  <div class="{{f.divClass}}">
-    <input id="{{f.id}}" name="{{f.name}}" type="{{f.type}}" placeholder="{{f.placeholder}}" class="{{f.class}}">
-  </div>
-</div>
-
-  
-<!-- Select Inputs -->
-<div class="form-group" ng-repeat="f in formSelectData">
-  <label class="{{f.labelClass}}" for="{{f.labelFor}}">{{f.name | uppercase}}</label>
-  <div class="{{f.divClass}}">
-    <select id="{{f.id}}" name="{{f.id}}" class="{{f.selectClass}}">
-      <option ng-repeat="o in f.selectOptions" value="{{o.val}}">{{o.val}}</option>
-      
-    </select>
-  </div>
-</div>
-
-
-
-<!-- Button -->
+<!-- Button Drop Down -->
 <div class="form-group">
-  <label class="col-md-4 control-label" for="submit"></label>
-  <div class="col-md-4">
-    <button id="submit" name="submit" class="btn btn-primary">Submit</button>
+  <label class="col-md-3 control-label" for="term">Find</label>
+  <div class="col-md-3">
+    <div class="input-group">
+      <input id="term" name="term" class="form-control" placeholder="term" type="text" required="">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Search By
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+          <li><a ng-click="setSearchBy('city')">City</a></li>
+          <li><a ng-click="setSearchBy('zip')">ZIP</a></li>
+          <li><a ng-click="setSearchBy('category')">Category</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
 </fieldset>
 </form>
+
+
+
+
+
+
+<!-- Text inputs-->
+
+<!-- <div class="form-group" ng-repeat="f in formTextData">
+  <label class="{{f.labelClass}}" for="{{f.labelFor}}">{{f.name | uppercase}}</label>
+  <div class="{{f.divClass}}">
+    <input id="{{f.id}}" name="{{f.name}}" type="{{f.type}}" placeholder="{{f.placeholder}}" class="{{f.class}}" ng-model="formData[f.model]">
+  </div>
+</div> -->
+
+  
+<!-- Select Inputs -->
+<!-- <div class="form-group" ng-repeat="f in formSelectData">
+  <label class="{{f.labelClass}}" for="{{f.labelFor}}">{{f.name | uppercase}}</label>
+  <div class="{{f.divClass}}">
+    <select id="{{f.id}}" name="{{f.id}}" class="{{f.selectClass}}" ng-model="formData[f.model]">
+      <option ng-repeat="o in f.selectOptions" value="{{o}}">{{o}}</option>
+      
+    </select>
+  </div>
+</div> -->
+
+
+<!-- Button -->
+<!-- <div class="form-group">
+  <label class="col-md-4 control-label" for="submit"></label>
+  <div class="col-md-4">
+    <button id="submit" name="submit" class="btn btn-primary">Submit</button>
+  </div>
+</div> -->
+
+
+<!-- 
+<pre>
+    {{ formData }}
+  </pre> -->

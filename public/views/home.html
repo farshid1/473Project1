@@ -1,7 +1,33 @@
-<div data-ng-init="load()" class="jumbotron text-center">
-	<h1>List of places near you</h1>
-	<ul>
-		<li ng-repeat="r in restaurants">{{ r.url }}</li>
-	</ul>
+<h1>List of restaurants near you</h1>
+<div data-ng-init="load()" class="container jumbotron">
+	<div class="row"  ng-repeat="r in restaurants">
+		<div class="col-md-6">
+			<google-map center="map[r.phone]" zoom="12" draggable="true">
+				<marker coords="map[r.phone]"></marker>
+		    </google-map>
+		</div>
+		<div class="col-md-6">
+			<table class="table">
+				<tr>
+					<td><h5>{{r.category}}</h5></td>
+					<td><a href="{{r.url}}">{{r.name}}</a></td>
+				</tr>
+				<tr>
+					<td>Address</td>
+					<td>
+						<address>
+							{{r.address_display[0]}} <br>
+							{{r.address_display[1]}} <br>
+							<span class="glyphicon glyphicon-phone-alt"></span> Phone:{{r.phone}}
+						</address>
+					</td>
+				</tr>
+				<tr><td>Rating</td><td><img src="{{r.rating_img_url}}"></td></tr>
+				<tr><td>Review Counts</td><td>{{r.review_count}}</td></tr>
+			</table>
+		</div>
+		<hr>
+	</div>
+
 	
 </div>

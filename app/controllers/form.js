@@ -5,7 +5,8 @@
  */
 var mongoose = require('mongoose'),
     TextInput = require('../models/form.js').TextInput,
-    SelectInput = require('../models/form.js').SelectInput;
+    SelectInput = require('../models/form.js').SelectInput,
+    Restaurant = require('../models/restaurant.js');
 
 
 /**
@@ -18,7 +19,7 @@ exports.textInput = function(req, res) {
                 status: 500
             });
         } else {
-            console.log(inputs);
+            //console.log(inputs);
             res.jsonp(inputs);
         }
     });
@@ -28,13 +29,13 @@ exports.textInput = function(req, res) {
  * List of All Select Inputs
  */
 exports.selectInput = function(req, res) {
-    SelectInput.find({},{'_id':0},function(err, inputs) {
+    SelectInput.find({},function(err, inputs) {
         if (err) {
             res.render('error', {
                 status: 500
             });
         } else {
-            console.log(inputs);
+            //console.log(inputs[0].selectOptions);
             res.jsonp(inputs);
         }
     });
@@ -42,29 +43,16 @@ exports.selectInput = function(req, res) {
 
 
 /**
- * List of Restaurants close by
+ * submit search form
  */
-exports.near = function(req, res) {
-    
-    var term = req.params.lon +','+ req.params.lat;
-    console.log(term);
-    
-    yelp.search({term: "food", ll: term, limit: 20}, function(err, data) {
-        if (err)  console.log(err);
-        //console.log(data,'data from yelp');
-        res.jsonp(data.businesses);
-    });
+var submit = function(req, res) {
+    console.log(req.body, "params from body");
 
-    // Restaurant.find({},function(err, restaurantsNear) {
-    //     if (err) {
-    //         res.render('error', {
-    //             status: 500
-    //         });
-    //     } else {
-    //         res.jsonp(restaurantsNear);
-    //     }
-    // });
+    // Restaurant.find({},)
+    // res.redirect('/search');
 };
+
+exports.submit = submit;
 
 /**
  * Find top restaurants

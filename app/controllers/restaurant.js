@@ -45,49 +45,56 @@ exports.all = function (req, res) {
             rank,
             radius           
  */
-var saveRestaurant = function (err, data) {
+
+var saveRestaurant = function (err, data, restObject, phone, result) {
     if (err) throw err;
 
-    restObject.location.push(data.results[0].geometry.location.lng);
-    restObject.location.push(data.results[0].geometry.location.lat);
-
+    //restObject.location.push(data.results[0].geometry.location.lng);
+    //restObject.location.push(data.results[0].geometry.location.lat);
+    //console.log(restObject);
     Restaurant.update({
-        phone: filteredRestaurant.phone
+        phone: phone
     }, restObject, {
         upsert: true
     }, function (err) {
         if (err) {
             throw err;
         }
+        result.push(restObject);
     });
 
-    result.push(restObject);
-    callback();
+    //result.push(restObject);
+    // console.log(result);
 
 };
 
-
-var getYelpData = function (err, data) {
+var getYelpData = function (err, data, res) {
     if (err) {
         throw err;
     }
     //console.log(data.businesses[0].location);
     var result = [];
     // we have to use async here because
-    _.each(data.businesses,
+    async.each(data.businesses,
         function (restaurant, callback){
-            filterYelpData(restaurant, callback);
+            filterYelpData(restaurant, result);
+            callback();
+            //res.jsonp(result)
         },
         function (err) {
             if (err) throw err;
+            console.log("Yelp request results:");
+            console.log(result);
+            //return response after results are filtered (async)
             res.jsonp(result);
-        });
+        }
+    );
 
 };
-var filterYelpData = function (restaurant, callback) {
+var filterYelpData = function (restaurant, result) {
 
     var filteredRestaurant = {};
-
+    //console.log(result);
     //name
     filteredRestaurant.name = restaurant.name;
     //url
@@ -110,18 +117,26 @@ var filterYelpData = function (restaurant, callback) {
     var rest = new Restaurant(filteredRestaurant),
         restObject = rest.toObject();
     delete restObject._id;
+    result.push(restObject);
 
     geocoder.geocode(filteredRestaurant.address_display[0] + filteredRestaurant.address_display[1],
-        saveRestaurant(err, data));
+        function(err, data) {
+            restObject.location.push(data.results[0].geometry.location.lng);
+            restObject.location.push(data.results[0].geometry.location.lat);
+            saveRestaurant(err, data, restObject, filteredRestaurant.phone, result);
+        }
+    );
 
 };
-var getRestaurants = function (err, docs, res) {
+var getRestaurants = function (err, docs, req, res) {
 
     if (err)
         throw err;
-    if (!_.isEmpty(docs)) {
+    if (_.isEmpty(docs)) {
         console.log('get data from mongodb');
         res.jsonp(docs);
+        console.log("Mongo results:");
+        console.log(docs);
     }
     // no result in the database, make a call to the yelp API
     else {
@@ -135,21 +150,117 @@ var getRestaurants = function (err, docs, res) {
             limit: 5
         },
         function (err, data) {
-            getYelpData(err, data);
+            getYelpData(err, data, res);
         });
     }
 };
 
 var near = function (req, res) {
-
+    var query = {};
+    if (req.body.zip) {
+        query.zip = req.body.zip;
+    }
+    else if (req.body.city) {
+        query.city = req.body.city;
+    };
     Restaurant.find({
         location: {
             '$near': [parseFloat(req.params.lon), parseFloat(req.params.lat)]
         }
     }, function(err, data) {
-        getRestaurants(err, data, res);
+        getRestaurants(err, data, req, res);
     });
 };
+
+
+// var near = function (req, res) {
+//     Restaurant.find({
+//         location: {
+//             '$near': [parseFloat(req.params.lon), parseFloat(req.params.lat)]
+//         }
+//     }, 
+//     function(err, data) {
+//         if (err)
+//             throw err;
+//         if (!_.isEmpty(data)) {
+//             console.log('get data from mongodb');
+//             res.jsonp(data);
+//         }
+//         // no result in the database, make a call to the yelp API
+//         else {
+//             console.log('get data from yelp API');
+//             var term = req.params.lon + ',' + req.params.lat;
+//             // we have to limit the result to 5 because of Google Maps API's OVER_QUERY_LIMIT error
+//             yelp.search({
+//                 term: "food",
+//                 ll: term,
+//                 radius_filter: "8000", // 5 miles
+//                 limit: 5
+//             },
+//             function (err, data) {
+//                 if (err) {
+//                     throw err;
+//                 }
+//                 //console.log(data.businesses[0].location);
+//                 var result = [];
+//                 // we have to use async here because
+//                 _.each(data.businesses,
+//                     function (restaurant){
+//                         var filteredRestaurant = {};
+//                         //name
+//                         filteredRestaurant.name = restaurant.name;
+//                         //url
+//                         filteredRestaurant.url = restaurant.url;
+//                         //distance
+//                         filteredRestaurant.distance = (restaurant.distance * MTR_TO_MILE).toFixed(2);
+//                         //rating_img_url
+//                         filteredRestaurant.rating_img_url = restaurant.rating_img_url;
+//                         //review_count
+//                         filteredRestaurant.review_count = restaurant.review_count;
+//                         //display_address
+//                         filteredRestaurant.address_display = restaurant.location.display_address;
+//                         //phone
+//                         filteredRestaurant.phone = restaurant.phone;
+//                         //category
+//                         filteredRestaurant.category = restaurant.categories[0][0];
+
+//                         // insert into the database after getting the 
+//                         //ref: http://stackoverflow.com/questions/7267102/how-do-i-update-upsert-a-document-in-mongoose
+//                         var rest = new Restaurant(filteredRestaurant),
+//                             restObject = rest.toObject();
+//                         delete restObject._id;
+
+//                         geocoder.geocode(filteredRestaurant.address_display[0] + filteredRestaurant.address_display[1],
+//                             function(err, data) {
+//                                 if (err) throw err;
+
+//                                 restObject.location.push(data.results[0].geometry.location.lng);
+//                                 restObject.location.push(data.results[0].geometry.location.lat);
+
+//                                 Restaurant.update({
+//                                     phone: filteredRestaurant.phone
+//                                 }, restObject, {
+//                                     upsert: true
+//                                 }, function (err) {
+//                                     if (err) {
+//                                         throw err;
+//                                     }
+//                                 });
+
+//                                 result.push(restObject);
+//                             }
+//                         );
+//                     },
+//                     function (err) {
+//                         if (err) throw err;
+//                         res.jsonp(result);
+//                     }
+//                 );
+//             });
+//         }
+//     });
+// };
+// Export the near method
 exports.near = near;
 
 /**

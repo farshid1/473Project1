@@ -1,1 +1,1 @@
-angular.module('sampleApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'MainService', 'SearchCtrl', 'SearchService']);
+angular.module('sampleApp', ['ngRoute', 'appRoutes','chieffancypants.loadingBar', 'MainCtrl', 'MainService', 'SearchCtrl', 'SearchService', 'google-maps' ]);

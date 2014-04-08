@@ -42,12 +42,8 @@ var TextInputSchema = new Schema({
 	}
 });
 
-var optionsSchema = new Schema({
-	val: {
-		type: String,
-		trim: true
-	}
-});
+
+
 var SelectInputSchema = new Schema({
 	id: {
 		type: String,
@@ -73,7 +69,7 @@ var SelectInputSchema = new Schema({
 		type: String,
     	trim: true
 	},
-	selectOptions: [optionsSchema]
+	selectOptions: [String]
 });
 
 	
@@ -83,5 +79,6 @@ var SelectInputSchema = new Schema({
 //We should add the last argument to link the model to our collection
 var TextInput = mongoose.model('TextInput', TextInputSchema, 'textInput');
 var SelectInput = mongoose.model('SelectInput', SelectInputSchema, 'selectInput');
+
 exports.TextInput = TextInput;
 exports.SelectInput = SelectInput;
