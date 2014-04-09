@@ -27,9 +27,9 @@ angular.module('SearchService', []).factory('SearchService',[ '$http', function(
 			});
 		},
 		postData: function (formData) {
-			console.log($.param(formData));
+			//console.log(formData);
 			return $http({
-				url: '/api/restaurant',
+				url: '/api/search',
 				data: JSON.stringify(formData),
 				method: 'POST',
 				header: {'Content-Type':'application/json'}

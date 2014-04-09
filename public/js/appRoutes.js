@@ -7,10 +7,14 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
 			templateUrl: 'views/home.html',
 			controller: 'MainController'
 		})
-			.when('/search', {
-				templateUrl: 'views/search.html',
-				controller: 'SearchController'	
-			});
+		.when('/search', {
+			templateUrl: 'views/search.html',
+			controller: 'SearchController'	
+		})
+		.when('/result', {
+			templateUrl: 'views/result.html',
+			controller: 'SearchController'
+		});
 
 	$locationProvider.html5Mode(true);
 

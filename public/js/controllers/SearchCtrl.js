@@ -26,7 +26,7 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 			function(r) {
 				
 				$scope.formSelectData = r.data;
-				//console.log($scope.formSelectData);
+				console.log($scope.formSelectData);
 				//alert('data loaded');
 			},
 			function () {
@@ -36,15 +36,23 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 
 	};
 
+	// Search Resul
+	$scope.restaurants = {};
+	$scope.formData = {};
+
 	$scope.submit = function (formData) {
+		console.log(formData);
+
 		$scope.master = angular.copy(formData);
 		delete $scope.formData;
-		$scope.formData = {};
+		
 		SearchService.postData($scope.master)
 		.then(
 			function(r) {
 				
-				console.log(r);
+				//console.log(r.data);
+				$scope.restaurants = angular.copy(r.data);
+
 				//alert('data loaded');
 			},
 			function () {

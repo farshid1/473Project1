@@ -9,7 +9,7 @@ module.exports = function(app) {
 	app.get('/api/getTextInput', form.textInput);
 	app.get('/api/getSelectInput', form.selectInput);
 	// POST requests
-	app.post('/api/restaurant', form.submit);
+	app.post('/api/search', restaurants.search);
 	// frontend routes =========================================================
 	// route to handle all angular requests
 	app.get('*', function(req, res) {
