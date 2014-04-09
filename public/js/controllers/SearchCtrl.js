@@ -6,15 +6,13 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 
 
 	$scope.master = {};
-	$scope.searchby = ['City', 'ZIP', 'Category'];
+	$scope.map = {};
 	$scope.load = function () {
 		
 		SearchService.getTextForm()
 		.then(
 			function(r) {
-				
 				$scope.formTextData = r.data;
-				console.log($scope.formTextData);
 				//alert('data loaded');
 			},
 			function () {
@@ -26,7 +24,6 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 			function(r) {
 				
 				$scope.formSelectData = r.data;
-				console.log($scope.formSelectData);
 				//alert('data loaded');
 			},
 			function () {
@@ -41,18 +38,24 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 	$scope.formData = {};
 
 	$scope.submit = function (formData) {
-		console.log(formData);
-
 		$scope.master = angular.copy(formData);
+		console.log($scope.master);
 		delete $scope.formData;
 		
 		SearchService.postData($scope.master)
 		.then(
 			function(r) {
-				
-				//console.log(r.data);
-				$scope.restaurants = angular.copy(r.data);
+				console.log(r.data);
+				var len = r.data.length;
+                for (var i = len - 1; i >= 0; i--) {
 
+                    $scope.map[r.data[i].phone] = {
+                        latitude: r.data[i].location[1],
+                        longitude: r.data[i].location[0]
+                    };
+
+                }
+				$scope.restaurants = angular.copy(r.data);
 				//alert('data loaded');
 			},
 			function () {
@@ -63,6 +66,7 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 	$scope.resetForm = function () {
 		$scope.formData = {};
 	};
+
 
 	$scope.resetForm();
 

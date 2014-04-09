@@ -39,7 +39,7 @@ var search = function(req, res) {
     ],
     function (err, result) {
         //console.log(result[0],'condition');
-        var query = Restaurant.find(result[0]).limit(req.body.limit ? req.body.limit : 10);
+        var query = Restaurant.find(result[0]).limit(req.body.limit ? req.body.limit : 5);
         query.exec(function (err, docs) {
              if (err) {
                 throw err;
@@ -61,8 +61,9 @@ var search = function(req, res) {
                         console.log(req.body.term,req.body.limit, "ll from waterfall");
                         console.log('get data from yelp');
                         yelp.search({
+                            term: 'food',
                             location: req.body.term,
-                            radius_filter: req.body.limit ? req.body.limit : "8000", // 5 miles
+                            radius_filter: req.body.radius ? req.body.radius : "8000", // 5 miles
                             limit: req.body.limit ? req.body.limit : 5
                         }, function (err, data) {
                             if (err) {
@@ -73,7 +74,7 @@ var search = function(req, res) {
                     },
                     // filter Yelp data
                     function (data, callback) {
-                        console.log(data.businesses, "data from yelp");
+                        //console.log(data.businesses, "data from yelp");
                         var result = [];
                         async.each(data.businesses,
                             function (restaurant, callback) {
@@ -168,7 +169,6 @@ var search = function(req, res) {
                                 callback(null, finalResult);
                             }
                         );
-                        console.log(finalResult, 'final result');
                         callback(null, finalResult);
                     },
                     // save to database
