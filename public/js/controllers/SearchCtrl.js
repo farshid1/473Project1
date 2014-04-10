@@ -39,8 +39,7 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 
 	$scope.submit = function (formData) {
 		$scope.master = angular.copy(formData);
-		console.log($scope.master);
-		delete $scope.formData;
+		//console.log($scope.master);
 		
 		SearchService.postData($scope.master)
 		.then(
@@ -63,12 +62,7 @@ angular.module('SearchCtrl',['SearchService']).controller('SearchController',['$
 			}
 		);
 	};
-	$scope.resetForm = function () {
-		$scope.formData = {};
-	};
-
-
-	$scope.resetForm();
+	
 
 	
 }]);

@@ -69,6 +69,7 @@ var search = function(req, res) {
                             if (err) {
                                 callback(err)
                             }
+                            console.log(data,'from yelp PLAIN')
                             callback(null, data);
                         });
                     },
@@ -176,21 +177,27 @@ var search = function(req, res) {
                         //console.log(result, "from save to db");
                         async.each(result,
                             function (item, callback) {
+                                if (!item.phone) item.phone = '';
+                                if (!item.postal_code) item.postal_code = '';
+                                if (!item.city) item.city = '';
+                                if (!item.category) item.category = '';
                                 Restaurant.update({
                                     phone: item.phone
                                 }, item, {
                                     upsert: true
                                 }, function (err) {
                                     if (err) {
-                                        callback(err);
+                                        console.log(err);
                                     }
                                     callback();
+                                    
                                 });
                             },
                             function (err) {
                                 if (err) {
                                     callback(err);
                                 }
+                                //callback();
                                 //console.log(result, "from save to databasae");
                             }
 
@@ -208,13 +215,21 @@ exports.search = search;
 /**
  * List of Restaurants close by
  */
-
+// {
+//                 "$geometry" : {
+//                    type : "Point" ,
+//                    coordinates : [ parseFloat(req.params.lon) , parseFloat(req.params.lat) ] },
+//                 "$maxDistance" : 4000
+//               }
 var near = function (req, res) {
-    var query = Restaurant.find({
-            location: {
-                '$near': [parseFloat(req.params.lon), parseFloat(req.params.lat)]
-            }
-        }).limit(10);
+    console.log(parseFloat(req.params.lon), parseFloat(req.params.lat));
+    var query = Restaurant.find(
+        { location :
+           { "$near" : [parseFloat(req.params.lon) , parseFloat(req.params.lat)],
+                "$maxDistance" : 500
+           }
+        }
+    ).limit(10);
     query.exec(function (err, docs) {
             if (err) {
                 throw err;
@@ -236,7 +251,7 @@ var near = function (req, res) {
                         yelp.search({
                             term: "restaurant",
                             ll: ll,
-                            radius_filter: "8000", // 5 miles
+                            radius_filter: "1000", // 5 miles
                             limit: 10
                         }, function (err, data) {
                             if (err) {

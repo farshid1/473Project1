@@ -35,18 +35,22 @@ var RestaurantSchema = new Schema({
     location: [Number],
     city: {
         type: String,
+        default: "",
         trim: true
     },
     postal_code : {
         type: String,
+        default: "",
         trim: true
     },
     phone: {
         type: String,
+        default: "",
         trim: true
     },
     category: {
         type: String,
+        default: "",
         trim: true
     }
 });
