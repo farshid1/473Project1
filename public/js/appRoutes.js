@@ -11,10 +11,7 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
 			templateUrl: 'views/search.html',
 			controller: 'SearchController'	
 		})
-		.when('/result', {
-			templateUrl: 'views/result.html',
-			controller: 'SearchController'
-		});
+		;
 
 	$locationProvider.html5Mode(true);
 
