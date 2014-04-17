@@ -16,15 +16,8 @@ var async = require('async'),
     }),
     MTR_TO_MILE = 0.000621371192;
 
-
-
- var getPostCoord = function (callback) {
-    //console.log(req, "request from waterfall");
-    var ll = req.params.lon + ',' + req.params.lat;
-    callback(null, ll);
-};
 var getYelpData = function (ll, callback) {
-    //console.log(ll, "ll from waterfall");
+    console.log('first callback called, get yelp data');
     yelp.search({
         term: "restaurant",
         ll: ll,
@@ -37,24 +30,23 @@ var getYelpData = function (ll, callback) {
         callback(null, data);
     });
 };
-var queryYelpData = function (callback) {
-    console.log('getting data from yelp');
+var queryYelpData = function (callback, req) {
+    console.log('first callback called, query for yelp data');
     yelp.search({
-        term: 'food',
+        term: 'restaurant',
         location: req.body.term,
         radius_filter: req.body.radius ? req.body.radius : "8000", // 5 miles
         limit: req.body.limit ? req.body.limit : 5
     }, function (err, data) {
-        console.log(data,'location from yelp PLAIN');
         if (err) {
             callback(err);
         }
-        console.log(data, "from queryYelpData");
+        console.log(data.businesses[0]);
         callback(null, data);
     });
 };
 var filterYelpData = function (data, callback) {
-    //console.log(data, "data from yelp");
+    console.log('second callback called, filter Yelp data');
     var result = [];
     async.each(data.businesses,
         function (restaurant, callback) {
@@ -93,17 +85,23 @@ var filterYelpData = function (data, callback) {
     );
 };
 var getCoordFromGoogle = function (result, callback) {
+    console.log('third callback called, get coordinates from geocoder ');
     var finalResult = [];
     async.each(result,
         function (item, callback) {
             async.waterfall([
                 function (callback) {
-                    geocoder.geocode(item.address_display[0] + item.address_display[1],
-                        function (err, data) {
+                    var address = "";
+                    for (var i = 0; i < item.address_display.length; i++) {
+                        address += item.address_display[i]
+                    }
+                    geocoder.geocode(address, function (err, data) {
                             if (err) {
                                 callback(err);
                             }
-                            if (data.status !== 'OVER_QUERY_LIMIT') {
+                            console.log("deocoder status ",data.status);
+                            // remember that some of the businesses from yelp don't have an address 
+                            if (data.status !== 'OVER_QUERY_LIMIT' && data.status !== 'ZERO_RESULTS') {
                                 item.location = [];
                                 item.location.push(data.results[0].geometry.location.lng);
                                 item.location.push(data.results[0].geometry.location.lat);
@@ -134,13 +132,13 @@ var getCoordFromGoogle = function (result, callback) {
             if (err) {
                 callback(err);
             }
-            res.jsonp(finalResult);
+            
             callback(null, finalResult);
         }
     );
-    callback(null, finalResult);
 };
 var saveToDB = function (result, callback) {
+    console.log('fourth callback called, save filtered data from Yelp to DB');
     async.each(result,
         function (item, callback) {
             //some of the data have 
@@ -163,6 +161,7 @@ var saveToDB = function (result, callback) {
             if (err) {
                 callback(err);
             }
+            callback(null, result);
         }
     );
 };
@@ -187,22 +186,32 @@ var search = function(req, res) {
             console.log(condition,'condition');
             var query = Restaurant.find(condition).limit(req.body.limit ? req.body.limit : 5);
             query.exec(function (err, docs) {
-                 if (err) {
+                console.log(docs.length);
+                if (err) {
                     throw err;
                 }
                 if (!_.isEmpty(docs)) {
+                    console.log("Get searched restaurants from mongodb");
                     res.jsonp(docs);
                 } else {
                     async.waterfall([
                         //get data from yelp
-                        queryYelpData(req, callback),
+                        function (callback) {
+                            queryYelpData(callback, req);
+                        },
                         //filter Yelp data
-                        filterYelpData(data, callback),
+                        filterYelpData,
                         //get coordinates from google map
-                        getCoordFromGoogle(result, callback),
+                        getCoordFromGoogle,
                         //save to database
-                        saveToDB(result, callback) 
-                    ]); 
+                        saveToDB 
+                    ],
+                    function(err, result) {
+                        if (err) {
+                            throw err;
+                        }
+                        res.jsonp(result);
+                    }); 
                 }
 
             });
@@ -225,23 +234,31 @@ var near = function (req, res) {
             if (err) {
                 throw err;
             }
-            if (!_.isEmpty(docs)) {
-                console.log('get data from mongodb');
-                console.log(docs);
+            if (!_.isEmpty(docs) || docs.length > 10) {
+                console.log('Get near restaurants from mongodb');
                 res.jsonp(docs);
             } else {
                 async.waterfall([
                     //get post coordinate
-                    getPostCoord(callback),
+                    function (callback) {
+                        var ll = req.params.lon + ',' + req.params.lat;
+                        callback(null, ll);
+                    },
                     //get yelp data
-                    getYelpData(ll, callback),
+                    getYelpData,
                     // filter yelp data
-                    filterYelpData(data, callback),
+                    filterYelpData,
                     // get coordinates from google map
-                    getCoordFromGoogle(result, callback),
+                    getCoordFromGoogle,
                     // save to database
-                    saveToDB(result, callback)
-                ]); // End of main async.waterfall to get data from yelp
+                    saveToDB
+                ],
+                function(err, result) {
+                    if (err) {
+                        throw err;
+                    }
+                    res.jsonp(result);
+                }); // End of main async.waterfall to get data from yelp
 
             } 
         }); 

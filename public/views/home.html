@@ -1,6 +1,6 @@
 <h1>List of restaurants near you</h1>
 <div data-ng-init="load()" class="container jumbotron">
-	<div class="row"  ng-repeat="r in restaurants">
+	<div class="row top-buffer"  ng-repeat="r in restaurants">
 		<div class="col-md-6">
 			<google-map center="map[r.phone]" zoom="12" draggable="true">
 				<marker coords="map[r.phone]"></marker>
